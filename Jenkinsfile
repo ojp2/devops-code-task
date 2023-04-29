@@ -65,24 +65,29 @@ pipeline {
     }
     
     stage('Deploy VPC and ECS Cluster') {
-      withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
-        sh "terraform  -chdir=terraform apply -target=module.vpc -target=module.ecs"
-
+      steps {
+        withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
+          sh "terraform  -chdir=terraform apply -target=module.vpc -target=module.ecs"
+        }
       }
+      
     }
 
     stage('Deploy Backend Service') {
-      withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
-        sh "terraform  -chdir=terraform apply -target=module.backend_task_definition"
+      steps {
+        withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
+          sh "terraform  -chdir=terraform apply -target=module.backend_task_definition"
+        }
       }
       
     }
 
     stage('Deploy Fronted Service') {
-      withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
-        sh "terraform  -chdir=terraform apply -target=module.frontend_task_definition"
+      steps {
+        withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
+          sh "terraform  -chdir=terraform apply -target=module.frontend_task_definition"
+        }
       }
-      
     }
   }
 }
