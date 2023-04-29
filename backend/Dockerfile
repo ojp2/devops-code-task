@@ -1,5 +1,5 @@
 # Specify the base image to use
-FROM --platform=linux/amd64 node:16
+FROM node:16
 
 # Set the working directory inside the container
 WORKDIR /app
