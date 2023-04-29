@@ -29,7 +29,7 @@ pipeline {
       }
       
       steps {
-        withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
+        withAWS(credentials: "aws-cred") {
           sh "aws ecr get-login-password --region \${AWS_REGION} | docker login --username AWS --password-stdin \${ECR_REGISTRY}"
           sh "docker push \${ECR_REGISTRY}/\${ECR_REPOSITORY}:\${IMAGE_TAG}"
         }
@@ -57,7 +57,7 @@ pipeline {
       }
       
       steps {
-        withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
+        withAWS(credentials: "aws-cred") {
           sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
           sh "docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
         }
@@ -66,7 +66,7 @@ pipeline {
     
     stage('Deploy VPC and ECS Cluster') {
       steps {
-        withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
+        withAWS(credentials: "aws-cred") {
           sh "terraform  -chdir=terraform apply -target=module.vpc -target=module.ecs"
         }
       }
@@ -75,7 +75,7 @@ pipeline {
 
     stage('Deploy Backend Service') {
       steps {
-        withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
+        withAWS(credentials: "aws-cred") {
           sh "terraform  -chdir=terraform apply -target=module.backend_task_definition"
         }
       }
@@ -84,7 +84,7 @@ pipeline {
 
     stage('Deploy Fronted Service') {
       steps {
-        withCredentials([awsEcr(credentialsId: 'aws-cred', region: AWS_REGION)]) {
+        withAWS(credentials: "aws-cred") {
           sh "terraform  -chdir=terraform apply -target=module.frontend_task_definition"
         }
       }
