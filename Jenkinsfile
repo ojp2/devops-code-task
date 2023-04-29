@@ -64,30 +64,24 @@ pipeline {
       }
     }
     
-    stage('Deploy VPC and ECS Cluster') {
+    stage('Deploy VPC, ECS Cluster and Services') {
       steps {
         withAWS(credentials: "aws-cred") {
-          sh "terraform  -chdir=terraform apply -target=module.vpc -target=module.ecs"
+          sh """
+            terraform init
+            echo "Deploying VPC and ECS cluster"
+            terraform  -chdir=terraform apply -auto-approve -target=module.vpc -target=module.ecs
+
+            echo "Deploying ECS Service Backend"
+            terraform  -chdir=terraform apply -auto-approve -target=module.backend_task_definition
+
+            echo "Deploying ECS Service Frontend"
+            terraform  -chdir=terraform apply -auto-approve -target=module.frontend_task_definition
+
+          """
         }
       }
       
-    }
-
-    stage('Deploy Backend Service') {
-      steps {
-        withAWS(credentials: "aws-cred") {
-          sh "terraform  -chdir=terraform apply -target=module.backend_task_definition"
-        }
-      }
-      
-    }
-
-    stage('Deploy Fronted Service') {
-      steps {
-        withAWS(credentials: "aws-cred") {
-          sh "terraform  -chdir=terraform apply -target=module.frontend_task_definition"
-        }
-      }
     }
   }
 }
