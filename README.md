@@ -1,59 +1,126 @@
 # Overview
-This repository contains a React frontend, and an Express backend that the frontend connects to.
+This repository contains a code Frontend and Backend and also there respective terraform code
 
-# Objective
-Deploy the frontend and backend to somewhere publicly accessible over the internet. The AWS Free Tier should be more than sufficient to run this project, but you may use any platform and tooling you'd like for your solution.
+## 📋 Objective
+Deploy the frontend and backend to somewhere publicly accessible over the internet, using docker, terraform using jenkins pipeline
 
-Fork this repo as a base. You may change any code in this repository to suit the infrastructure you build in this code challenge.
-
-# Submission
-1. A github repo that has been forked from this repo with all your code.
-2. Modify this README file with instructions for:
-* Any tools needed to deploy your infrastructure
-* All the steps needed to repeat your deployment process
-* URLs to the your deployed frontend.
-
-# Evaluation
-You will be evaluated on the ease to replicate your infrastructure. This is a combination of quality of the instructions, as well as any scripts to automate the overall setup process.
 
 # Setup your environment
-Install nodejs. Binaries and installers can be found on nodejs.org.
-https://nodejs.org/en/download/
 
-For macOS or Linux, Nodejs can usually be found in your preferred package manager.
-https://nodejs.org/en/download/package-manager/
+## ECR
+---
+ECR repository needs to be deployed, *backend* and *frontend*
+  
+## Jenkins 
+---
+1.  Jenkins is deployed on a  EC2 istance and also configured Route53 rules for Jenkins ``` http://jenkins.hicloudsolution.com:8080/job/ecs_deploy_job/```
 
-Depending on the Linux distribution, the Node Package Manager `npm` may need to be installed separately.
+2. Once Jenkins is installed. Plugins needs to be installed 
+    1. Git
+    2. AWS
+    3. Terraform
 
-# Running the project
-The backend and the frontend will need to run on separate processes. The backend should be started first.
+3.  Jenkinsfile is defined at the root of the repository. In which I have defined Stages for building and pushing Docker image to ECR. And then deploying the terraform code for VPC, ECS cluster and ECS Services
+  
+## Terraform
+---
+The repository contains the Terraform code for VPC, ECS Cluster and ECS Service. The code of terraform is inside the ``` terraform/``` folder
+
+Jenkinsfile contain all the command to deploy the terraform code
+
+## 📰 Usage
+---
+
+**How to create backendcservice:**
+
 ```
-cd backend
-npm ci
-npm start
+module "backend_task_definition" {
+  source = "./backend"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  vpc_id            = module.vpc.vpc_id
+  ecs_cluster_id    = module.ecs.ecs_cluster_arn
+  backend_image_uri = var.backend_image_uri
+  public_subnets    = module.vpc.public_subnets
+  certificate_arn   = var.certificate_arn
+  aws_region        = var.aws_region
+}
 ```
-The backend should response to a GET request on `localhost:8080`.
 
-With the backend started, the frontend can be started.
+**How to create frontend service:**
+
 ```
-cd frontend
-npm ci
-npm start
+module "frontend_task_definition" {
+  source = "./frontend"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  vpc_id             = module.vpc.vpc_id
+  ecs_cluster_id     = module.ecs.ecs_cluster_arn
+  frontend_image_uri = var.frontend_image_uri
+  public_subnets     = module.vpc.public_subnets
+  certificate_arn    = var.certificate_arn
+  aws_region         = var.aws_region
+}
 ```
-The frontend can be accessed at `localhost:3000`. If the frontend successfully connects to the backend, a message saying "SUCCESS" followed by a guid should be displayed on the screen.  If the connection failed, an error message will be displayed on the screen.
 
-# Configuration
-The frontend has a configuration file at `frontend/src/config.js` that defines the URL to call the backend. This URL is used on `frontend/src/App.js#12`, where the front end will make the GET call during the initial load of the page.
+## Deploy Terrform code from localhost
 
-The backend has a configuration file at `backend/config.js` that defines the host that the frontend will be calling from. This URL is used in the `Access-Control-Allow-Origin` CORS header, read in `backend/index.js#14`
+## Requirements
+---
 
-# Optional Extras
-The core requirement for this challenge is to get the provided application up and running for consumption over the public internet. That being said, there are some opportunities in this code challenge to demonstrate your skill sets that are above and beyond the core requirement.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.2.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.0 |
 
-A few examples of extras for this coding challenge:
-1. Dockerizing the application
-2. Scripts to set up the infrastructure
-3. Providing a pipeline for the application deployment
-4. Running the application in a serverless environment
+## Prerequisites
+---
 
-This is not an exhaustive list of extra features that could be added to this code challenge. At the end of the day, this section is for you to demonstrate any skills you want to show that’s not captured in the core requirement.
+- [terraform](https://learn.hashicorp.com/terraform/getting-started/install#installing-terraform)
+- [terraform-docs](https://github.com/segmentio/terraform-docs)
+
+
+## 📌 Deploy terraform command
+---
+
+1. Initialize the terraform code
+
+```
+terraform init -chdir=terraform
+```
+
+2. Deploy VPC and ECS Cluster Terraform code
+
+```
+terraform -chdir=terraform apply -auto-approve -target=module.vpc -target=module.ecs
+```
+
+3. Deploy Backend Service 
+
+```
+terraform -chdir=terraform apply -auto-approve -target=module.backend_task_definition
+```
+
+4. Deploy Frontend Service
+
+```
+terraform -chdir=terraform apply -auto-approve -target=module.frontend_task_definition
+```
+
+## 🌎 Useful links:
+---
+
+**Frontend_url:** 
+  https://frontend.hicloudsolution.com/
+
+
+**Backend_url:**
+  https://backend.hicloudsolution.com/
+
+
+## 📈 Diagram
+---
+
+No diagrams for this task.
