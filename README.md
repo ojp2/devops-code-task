@@ -8,11 +8,9 @@ Deploy the frontend and backend to somewhere publicly accessible over the intern
 # Setup your environment
 
 ## ECR
----
 ECR repository needs to be deployed, *backend* and *frontend*
   
 ## Jenkins 
----
 1.  Jenkins is deployed on a  EC2 istance and also configured Route53 rules for Jenkins ``` http://jenkins.hicloudsolution.com:8080/job/ecs_deploy_job/```
 
 2. Once Jenkins is installed. Plugins needs to be installed. Inside Manage Jenkins
@@ -23,13 +21,11 @@ ECR repository needs to be deployed, *backend* and *frontend*
 3.  Jenkinsfile is defined at the root of the repository. In which I have defined Stages for building and pushing Docker image to ECR. And then deploying the terraform code for VPC, ECS cluster and ECS Services
   
 ## Terraform
----
 The repository contains the Terraform code for VPC, ECS Cluster and ECS Service. The code of terraform is inside the ``` terraform/``` folder
 
 Jenkinsfile contain all the command to deploy the terraform code
 
 ## 📰 Usage
----
 
 **How to create backendcservice:**
 
@@ -68,7 +64,6 @@ module "frontend_task_definition" {
 ## Deploy Terrform code from localhost
 
 ## Requirements
----
 
 | Name | Version |
 |------|---------|
@@ -76,14 +71,12 @@ module "frontend_task_definition" {
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.0 |
 
 ## Prerequisites
----
 
 - [terraform](https://learn.hashicorp.com/terraform/getting-started/install#installing-terraform)
 - [terraform-docs](https://github.com/segmentio/terraform-docs)
 
 
 ## 📌 Deploy terraform command
----
 
 1. Initialize the terraform code
 
@@ -110,7 +103,6 @@ terraform -chdir=terraform apply -auto-approve -target=module.frontend_task_defi
 ```
 
 ## 🌎 Useful links:
----
 
 **Frontend_url:** 
   https://frontend.hicloudsolution.com/
@@ -121,6 +113,5 @@ terraform -chdir=terraform apply -auto-approve -target=module.frontend_task_defi
 
 
 ## 📈 Diagram
----
 
 No diagrams for this task.
