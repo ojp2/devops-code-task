@@ -15,7 +15,7 @@ ECR repository needs to be deployed, *backend* and *frontend*
 ---
 1.  Jenkins is deployed on a  EC2 istance and also configured Route53 rules for Jenkins ``` http://jenkins.hicloudsolution.com:8080/job/ecs_deploy_job/```
 
-2. Once Jenkins is installed. Plugins needs to be installed 
+2. Once Jenkins is installed. Plugins needs to be installed. Inside Manage Jenkins
     1. Git
     2. AWS
     3. Terraform
